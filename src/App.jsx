@@ -65,11 +65,6 @@ function App() {
         }));
     }, [playerState.currentTrackIndex, playerState.activePlaylist]);
 
-    const handleNextRef = useRef(handleNext);
-    useEffect(() => {
-        handleNextRef.current = handleNext;
-    }, [handleNext]);
-
     const handlePrev = useCallback(() => {
         if (!playerState.activePlaylist) return;
         const newIndex = (playerState.currentTrackIndex - 1 + playerState.activePlaylist.tracks.length) % playerState.activePlaylist.tracks.length;
@@ -94,6 +89,22 @@ function App() {
             }));
          }
     }, [playerState.currentTrack, handlePlayPause]);
+
+    const handleClosePlayer = useCallback(() => {
+        if (wavesurferRef.current) {
+            wavesurferRef.current.stop(); // สั่งให้หยุดเล่นเพลง
+        }
+        // ล้างค่า Playlist ที่กำลังเล่นอยู่
+        setPlayerState(prev => ({
+            ...prev,
+            isPlaying: false,
+            currentTrack: null,
+            activePlaylistId: null,
+            activePlaylist: null, // บรรทัดนี้สำคัญที่สุดครับ!
+            currentTime: 0,
+            duration: 0,
+        }));
+    }, []);
     
     const handleVolumeChange = useCallback((e) => {
         const newVolume = parseFloat(e.target.value);
@@ -135,6 +146,7 @@ function App() {
             height: 40,
             normalize: true,
             cursorWidth: 0,
+            width : null,
             barWidth: 2,
             barRadius: 2,
             dragToSeek: true,
@@ -152,7 +164,7 @@ function App() {
         const onPlay = () => setPlayerState(prev => ({ ...prev, isPlaying: true }));
         const onPause = () => setPlayerState(prev => ({ ...prev, isPlaying: false }));
         const onTimeUpdate = (currentTime) => setPlayerState(prev => ({ ...prev, currentTime }));
-        const onFinish = () => handleNextRef.current();
+        const onFinish = () => handleNext();
         // 'interaction' คือการที่ผู้ใช้คลิกบนคลื่นเสียงเพื่อ seek
         const onInteraction = (newTime) => ws.setTime(newTime);
 
@@ -167,7 +179,7 @@ function App() {
         return () => {
             ws.destroy();
         }
-    }, []);
+    }, [handleNext]);
 
     // 5. useEffect สำหรับโหลดเพลงใหม่เมื่อ currentTrack เปลี่ยน
     useEffect(() => {
@@ -207,7 +219,8 @@ function App() {
                     onPrev={handlePrev}
                     onVolumeChange={handleVolumeChange}
                     onToggleMute={toggleMute}
-                    waveformContainerRef={waveformContainerRef} // 8. ส่ง ref ไปให้ BottomPlayer
+                    waveformContainerRef={waveformContainerRef}
+                    onClosePlayer={handleClosePlayer} // 8. ส่ง ref ไปให้ BottomPlayer
                 />
             </div>
         </React.Fragment>

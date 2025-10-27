@@ -178,7 +178,7 @@ function DraggableRowComponent({ children }) {
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: 'none',
         padding: '20px 0',
-        touchAction: 'none',
+        touchAction: 'pan-y',
         WebkitOverflowScrolling: 'touch',
         position: 'relative',
         zIndex: 1
