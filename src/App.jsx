@@ -65,6 +65,11 @@ function App() {
         }));
     }, [playerState.currentTrackIndex, playerState.activePlaylist]);
 
+    const handleNextRef = useRef(handleNext);
+    useEffect(() => {
+        handleNextRef.current = handleNext;
+    }, [handleNext]);
+
     const handlePrev = useCallback(() => {
         if (!playerState.activePlaylist) return;
         const newIndex = (playerState.currentTrackIndex - 1 + playerState.activePlaylist.tracks.length) % playerState.activePlaylist.tracks.length;
@@ -130,7 +135,6 @@ function App() {
             height: 40,
             normalize: true,
             cursorWidth: 0,
-            width : null,
             barWidth: 2,
             barRadius: 2,
             dragToSeek: true,
@@ -148,7 +152,7 @@ function App() {
         const onPlay = () => setPlayerState(prev => ({ ...prev, isPlaying: true }));
         const onPause = () => setPlayerState(prev => ({ ...prev, isPlaying: false }));
         const onTimeUpdate = (currentTime) => setPlayerState(prev => ({ ...prev, currentTime }));
-        const onFinish = () => handleNext();
+        const onFinish = () => handleNextRef.current();
         // 'interaction' คือการที่ผู้ใช้คลิกบนคลื่นเสียงเพื่อ seek
         const onInteraction = (newTime) => ws.setTime(newTime);
 
@@ -163,7 +167,7 @@ function App() {
         return () => {
             ws.destroy();
         }
-    }, [handleNext]);
+    }, []);
 
     // 5. useEffect สำหรับโหลดเพลงใหม่เมื่อ currentTrack เปลี่ยน
     useEffect(() => {
