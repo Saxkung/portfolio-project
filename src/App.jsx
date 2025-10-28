@@ -34,6 +34,7 @@ function App() {
     
     const wavesurferRef = useRef(null); // Ref สำหรับเก็บ instance ของ WaveSurfer
     const waveformContainerRef = useRef(null); // Ref สำหรับ div ที่จะให้ WaveSurfer วาดคลื่นเสียง
+    
 
     
     const handlePlayPause = useCallback(() => {
