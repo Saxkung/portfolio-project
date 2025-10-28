@@ -1,13 +1,13 @@
 @font-face {
     font-family: 'Rock Better';
-    src: url('src/assets/Fonts/Rock Better.ttf') format('truetype');
+    src: url('/assets/Fonts/Rock Better.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Inter Italic';
-    src: url('src/assets/Fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+    src: url('/assets/Fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
 }
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Inter Italic', sans-serif;
@@ -41,7 +41,7 @@ main {
     font-family: 'Inter Italic', sans-serif;
     font-weight: 300;
     letter-spacing: 2px;
-    font-size: 1.1rem;
+    font-size: 1.12rem;
     transform: scaleY(0.92);
     transition: opacity 0.3s ease;
 }
@@ -91,7 +91,6 @@ main {
     position: relative;
 }
 
-/* เพิ่ม animation สำหรับ navbar collapse */
 .navbar-collapse {
     transition: all 0.3s ease-in-out;
 }
@@ -106,7 +105,6 @@ main {
     transform: translateY(0);
 }
 
-/* เพิ่ม animation สำหรับ nav links */
 .nav-link::after {
     content: '';
     position: absolute;
@@ -123,7 +121,6 @@ main {
     width: 100%;
 }
 
-/* Animation สำหรับ navbar-toggler */
 .navbar-toggler {
     transition: transform 0.3s ease;
 }
@@ -139,12 +136,30 @@ main {
 
 .hero-section {
     height: 100vh;
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/src/assets/Bg/bg01.gif') no-repeat center center;
-    background-size: cover;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.hero-bg-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -1; /* ให้อยู่หลังสุด */
+
+    filter: brightness(0.5);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2; /* ให้อยู่ทับวิดีโอ */
 }
 
 .hero-section h1 {
@@ -161,7 +176,7 @@ main {
 
 @media (max-width: 768px) {
     .hero-section h1 { font-size: 3rem; }
-    .hero-section p { font-size: 0.8rem; }
+    .hero-section p { font-size: 0.7rem; }
 }
 
 .section {
@@ -236,7 +251,7 @@ main {
 
 @media (max-width: 1200px) {
     .card-wrapper { 
-        width: calc(100% / 3); /* แสดง 3 cards ต่อแถวใน screen ขนาดกลาง */
+        width: calc(100% / 3.2); /* แสดง 3.2 cards ต่อแถวใน screen ขนาดกลาง */
         padding: 10px;
     }
     .draggable-row {
@@ -247,14 +262,14 @@ main {
 
 @media (max-width: 992px) {
     .card-wrapper { 
-        width: calc(100% / 2.5); /* แสดง 2.5 cards ต่อแถวใน tablet */
+        width: calc(100% / 2.2); /* แสดง 2.2 cards ต่อแถวใน tablet */
         padding: 10px;
     }
 }
 
 @media (max-width: 768px) {
     .card-wrapper { 
-        width: calc(100% / 1.5); /* แสดง 1.5 cards ต่อแถวใน mobile */
+        width: calc(100% / 1.2); /* แสดง 1.2 cards ต่อแถวใน mobile */
         padding: 8px; 
     }
     .draggable-row {
@@ -438,6 +453,7 @@ main {
     background-color: #333;
 }
 .playlist-item.active {
+    
     background-color: var(--accent-color);
     color: var(--primary-color);
 }
@@ -455,7 +471,7 @@ main {
 }
 
 #about img {
-    max-width: 100%;
+    max-width: 50%;
     border-radius: 12px;
     pointer-events: none;
 }
@@ -609,10 +625,7 @@ footer {
     .bottom-player-volume {
         display: none !important;
     }
-    
-    /*.waveform-container {
-        order: 4;
-    }*/
+
 }
 .bottom-player-track-info img {
     width: 56px;
@@ -679,8 +692,6 @@ footer {
     background-color: var(--accent-color);
 }
 
-/* Center the visual triangle of the play icon which is often visually left-heavy
-   Only nudge the play icon so pause icon remains centered as-is */
 .player-buttons .play-pause-btn i.fa-play {
     display: inline-block;
     transform: translateX(1px);
@@ -747,8 +758,6 @@ footer {
 }
 
 @media (max-width: 768px) {
-    /* Make bottom player taller on mobile and place track info at top-right
-       Controls will sit below centered. Keep volume visible at top-left. */
     .bottom-player {
         height: 160px;
         align-items: flex-start;
@@ -758,16 +767,13 @@ footer {
     .bottom-player-controls {
         width: 100%;
         order: 2;
-        /* leave room for top track info; increase a bit to avoid overlap with absolute player-buttons */
         margin-top: 80px;
         justify-content: center;
         padding: 0 12px;
     }
 
-    /* On mobile place playback buttons level with the track image's vertical center */
     .bottom-player-controls .player-buttons {
         position: absolute;
-        /* image top (12px) + half image height (27px) - half button height (~16px) = 23px */
         top: calc(12px + 27px - 16px);
         left: 50%;
         transform: translateX(-50%);
@@ -779,7 +785,7 @@ footer {
         display: flex;
         position: absolute;
         top: 12px;
-        left: 16px; /* moved to left */
+        left: 16px;
         right: auto;
         width: auto;
         min-width: 0;
@@ -798,10 +804,9 @@ footer {
 
     .bottom-player-track-info .details {
         max-width: 140px;
-        text-align: left; /* align text to left when track info is left */
+        text-align: left;
     }
 
-    /* On mobile we hide the volume area (useful to reduce clutter) */
     .bottom-player-volume {
         display: none !important;
     }
@@ -813,57 +818,4 @@ footer {
     }
 }
 
-.preloader {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--primary-color);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-    opacity: 1;
-    visibility: visible;
-}
-
-.preloader.fade-out {
-    opacity: 0;
-    visibility: hidden;
-}
-
-.preloader-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 700;
-    font-size: 2.2rem;
-    color: var(--text-color);
-    margin-bottom: 20px;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #444;
-    border-top-color: var(--accent-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.app-content {
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-.app-content.visible {
-    opacity: 1;
-}
 

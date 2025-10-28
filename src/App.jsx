@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, Suspense, lazy } from 'react';
 import './App.css';
 import WaveSurfer from 'wavesurfer.js'
 
@@ -6,17 +6,18 @@ import { portfolioDataCategorized } from './data/portfolioData';
 
 import Header from './components/Header';
 import HeroSection from './components/HeroSection';
-import PortfolioSection from './components/PortfolioSection';
-import AboutSection from './components/AboutSection';
-import ContactSection from './components/ContactSection';
+//import PortfolioSection from './components/PortfolioSection';
+//import AboutSection from './components/AboutSection';
+//import ContactSection from './components/ContactSection';
 import BottomPlayer from './components/BottomPlayer';
-import Preloader from './components/Preloader';
 
 
+const PortfolioSection = lazy(() => import('./components/PortfolioSection'));
+const AboutSection = lazy(() => import('./components/AboutSection'));
+const ContactSection = lazy(() => import('./components/ContactSection'));
+
+ 
 function App() {
-    const [isLoading, setIsLoading] = useState(true);
-    const [isFading, setIsFading] = useState(false);
-    const [contentVisible, setContentVisible] = useState(false);
 
     const [playerState, setPlayerState] = useState({
         isPlaying: false,
@@ -31,24 +32,10 @@ function App() {
         volumeBeforeMute: 1,
     });
     
-    // 2. สร้าง Ref สำหรับ WaveSurfer สองตัว
     const wavesurferRef = useRef(null); // Ref สำหรับเก็บ instance ของ WaveSurfer
     const waveformContainerRef = useRef(null); // Ref สำหรับ div ที่จะให้ WaveSurfer วาดคลื่นเสียง
 
     
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsFading(true);
-            setTimeout(() => {
-                setIsLoading(false);
-                setContentVisible(true);
-            }, 500); 
-        }, 1000); 
-
-        return () => clearTimeout(timer);
-    }, []);
-
-    // 3. สร้างฟังก์ชันควบคุมหลัก
     const handlePlayPause = useCallback(() => {
         if (wavesurferRef.current) {
             wavesurferRef.current.playPause();
@@ -92,7 +79,7 @@ function App() {
 
     const handleClosePlayer = useCallback(() => {
         if (wavesurferRef.current) {
-            wavesurferRef.current.stop(); // สั่งให้หยุดเล่นเพลง
+            wavesurferRef.current.stop();
         }
         // ล้างค่า Playlist ที่กำลังเล่นอยู่
         setPlayerState(prev => ({
@@ -100,7 +87,7 @@ function App() {
             isPlaying: false,
             currentTrack: null,
             activePlaylistId: null,
-            activePlaylist: null, // บรรทัดนี้สำคัญที่สุดครับ!
+            activePlaylist: null,
             currentTime: 0,
             duration: 0,
         }));
@@ -132,7 +119,6 @@ function App() {
         });
     }, []);
 
-    // 4. useEffect หลักสำหรับสร้างและจัดการ WaveSurfer
     useEffect(() => {
         if (!waveformContainerRef.current) return;
 
@@ -144,10 +130,10 @@ function App() {
             waveColor: '#4d4d4d',
             progressColor: '#c6b185',
             height: 40,
-            normalize: true,
+            normalize: false,
             cursorWidth: 0,
-            width : null,
             barWidth: 2,
+            barGap: 2,
             barRadius: 2,
             dragToSeek: true,
             responsive: true,
@@ -156,7 +142,6 @@ function App() {
 
         wavesurferRef.current = ws;
 
-        // --- ตั้งค่า Event Listeners ---
         const onReady = () => {
             setPlayerState(prev => ({ ...prev, duration: ws.getDuration() }));
             ws.play();
@@ -165,7 +150,6 @@ function App() {
         const onPause = () => setPlayerState(prev => ({ ...prev, isPlaying: false }));
         const onTimeUpdate = (currentTime) => setPlayerState(prev => ({ ...prev, currentTime }));
         const onFinish = () => handleNext();
-        // 'interaction' คือการที่ผู้ใช้คลิกบนคลื่นเสียงเพื่อ seek
         const onInteraction = (newTime) => ws.setTime(newTime);
 
         ws.on('ready', onReady);
@@ -181,14 +165,12 @@ function App() {
         }
     }, [handleNext]);
 
-    // 5. useEffect สำหรับโหลดเพลงใหม่เมื่อ currentTrack เปลี่ยน
     useEffect(() => {
         if (wavesurferRef.current && playerState.currentTrack) {
             wavesurferRef.current.load(playerState.currentTrack.src);
         }
     }, [playerState.currentTrack]);
     
-    // 6. useEffect สำหรับปรับระดับเสียง
     useEffect(() => {
         if(wavesurferRef.current) {
             wavesurferRef.current.setVolume(playerState.volume);
@@ -197,21 +179,23 @@ function App() {
 
 
     return (
-        <React.Fragment>
-            {isLoading && <Preloader isFading={isFading} />}
-            <div className={`app-content ${contentVisible ? 'visible' : ''}`}>
-                {/* 7. ลบแท็ก <audio> ออกจากตรงนี้ */}
+        <React.Fragment>       
+            <div className={`app-content visible`}>
                 <Header />
                 <main>
                     <HeroSection />
-                    <PortfolioSection 
-                        playerState={playerState} 
-                        onTrackSelect={handleTrackSelect}
-                        portfolioData={portfolioDataCategorized} 
-                    />
-                    <AboutSection />
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <PortfolioSection 
+                            playerState={playerState} 
+                            onTrackSelect={handleTrackSelect}
+                            portfolioData={portfolioDataCategorized} 
+                        />
+                        <AboutSection />
+                    </Suspense>
                 </main>
-                <ContactSection />
+                <Suspense fallback={null}> 
+                    <ContactSection />
+                </Suspense>
                 <BottomPlayer 
                     playerState={playerState}
                     onPlayPause={handlePlayPause}

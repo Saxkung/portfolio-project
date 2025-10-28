@@ -21,15 +21,14 @@ function MusicCardComponent({ item, playerState, onTrackSelect }) {
         
         const deltaX = Math.abs(e.clientX - startPos.current.x);
         const deltaY = Math.abs(e.clientY - startPos.current.y);
-        
-        // ถ้าเคลื่อนที่มากกว่า 5px ถือว่าเป็นการลาก
-        if (deltaX > 5 || deltaY > 5) {
+
+        // ถ้าเคลื่อนที่มากกว่า 3px ถือว่าเป็นการลาก
+        if (deltaX > 3 || deltaY > 3) {
             setIsDragging(true);
         }
     };
 
     const handleMouseUp = () => {
-        // รอสักครู่ก่อนรีเซ็ต isDragging เพื่อให้ handleCardClick ทำงานได้ถูกต้อง
         if (dragTimeout.current) {
             clearTimeout(dragTimeout.current);
         }
@@ -40,7 +39,6 @@ function MusicCardComponent({ item, playerState, onTrackSelect }) {
     };
 
     const handleCardClick = (e) => {
-        // ถ้าคลิกที่ playlist หรือกำลังลากอยู่ ไม่ต้องทำอะไร
         if (e.target.closest('.audio-player-wrapper') || isDragging) {
             return;
         }

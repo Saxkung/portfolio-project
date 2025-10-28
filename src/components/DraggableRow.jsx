@@ -53,7 +53,6 @@ function DraggableRowComponent({ children }) {
         const currentTime = Date.now();
         const deltaTime = currentTime - lastTime.current;
         
-        // คำนวณความเร็ว
         if (deltaTime > 0) {
             const deltaX = pageX - lastX.current;
             velocity.current = deltaX / deltaTime;
@@ -72,7 +71,6 @@ function DraggableRowComponent({ children }) {
         const maxPos = 0;
         const minPos = -(innerWidth - containerWidth);
         
-        // ปรับ elastic effect แบบยืดหยุ่นมากขึ้น
         if (newPos > maxPos) {
             const overscroll = newPos - maxPos;
             newPos = maxPos + (overscroll * 0.35);
@@ -106,12 +104,10 @@ function DraggableRowComponent({ children }) {
         const cardUnit = cardWidth + gap;
         const currentPos = Math.abs(position);
         
-        // คำนวณตำแหน่งของ card สุดท้าย
         const totalCards = inner.children.length;
         const lastCardPos = (totalCards - 1) * cardUnit;
-        const visibleWidth = containerWidth - cardWidth; // พื้นที่ที่มองเห็นได้จริงๆ
+        const visibleWidth = containerWidth - cardWidth;
         
-        // เช็คว่าอยู่ใกล้ขอบขวาหรือไม่
         const distanceFromEnd = lastCardPos - currentPos;
         const isNearEnd = distanceFromEnd <= visibleWidth;
         
@@ -119,13 +115,10 @@ function DraggableRowComponent({ children }) {
         inner.style.transition = `transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)`;
         
         if (position > maxPos) {
-            // ถ้าเลยขอบซ้าย ให้ดูดกลับมาที่ขอบซ้าย
             targetPos = maxPos;
         } else if (isNearEnd) {
-            // ถ้าใกล้ขอบขวา ให้ดูดไปติดขอบขวา
             targetPos = minPos;
         } else {
-            // กรณีปกติ ใช้การ snap กับ card ที่ใกล้ที่สุด
             const nearestCard = Math.round(currentPos / cardUnit);
             targetPos = -(nearestCard * cardUnit);
             
@@ -141,8 +134,6 @@ function DraggableRowComponent({ children }) {
             }
         }
         
-        // ตรวจสอบว่าอยู่นอกขอบหรือไม่
-        // ตรวจสอบขอบเขตก่อน
         if (position > maxPos) {
             inner.style.transition = `transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)`;
             updatePosition(maxPos);
@@ -159,13 +150,11 @@ function DraggableRowComponent({ children }) {
             const direction = -Math.sign(currentVelocity);
             const nextCard = nearestCard + direction;
             
-            // ตรวจสอบว่า card ถัดไปยังอยู่ในขอบเขตหรือไม่
             if (nextCard >= 0 && nextCard * cardUnit <= Math.abs(minPos)) {
                 targetPos = -(nextCard * cardUnit);
             }
         }
         
-        // คำนวณระยะเวลา transition ตามระยะทาง
         const distance = Math.abs(position - targetPos);
         const duration = 0.3; // ใช้เวลาคงที่เพื่อให้รู้สึกเสถียร
         
@@ -203,7 +192,6 @@ function DraggableRowComponent({ children }) {
         
         if (innerWidth <= containerWidth) return;
         
-        // หยุดการ scroll ของหน้าเว็บเมื่อมีการ scroll แนวนอน
         if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
             e.preventDefault();
             e.stopPropagation();
@@ -214,7 +202,6 @@ function DraggableRowComponent({ children }) {
             
             let finalPos = newPos;
             
-            // จำกัดการเลื่อนให้อยู่ในขอบเขต
             if (finalPos > maxPos) {
                 finalPos = maxPos;
             } else if (finalPos < minPos) {
