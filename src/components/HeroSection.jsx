@@ -5,7 +5,6 @@ export default function HeroSection() {
         <section className="hero-section">
             <video autoPlay loop muted playsInline className="hero-bg-video">
                 <source src="/assets/Bg/bg_2.webm" type="video/webm" />
-                Your browser does not support the video tag.
             </video>
             
             <div className="container">

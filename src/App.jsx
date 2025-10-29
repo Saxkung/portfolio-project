@@ -185,7 +185,7 @@ function App() {
                 <Header />
                 <main>
                     <HeroSection />
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense>
                         <PortfolioSection 
                             playerState={playerState} 
                             onTrackSelect={handleTrackSelect}

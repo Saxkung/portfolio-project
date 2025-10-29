@@ -7,7 +7,7 @@ export default function PortfolioSection({ playerState, onTrackSelect, portfolio
     return (
         <section id="portfolio" className="section">
             <div className="container">
-                <AnimateOnScroll><h2 className="section-title fade-up">Work</h2></AnimateOnScroll>
+                <AnimateOnScroll><h2 className="section-title fade-up">Works</h2></AnimateOnScroll>
                 {portfolioData.map((categoryData, index) => (
                     <div key={index} className="mb-5">
                         <AnimateOnScroll>
