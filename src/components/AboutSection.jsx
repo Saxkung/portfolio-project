@@ -8,7 +8,7 @@ export default function AboutSection() {
                 <AnimateOnScroll><h2 className="section-title fade-up">About</h2></AnimateOnScroll>
                 <div className="row align-items-center">
                     <AnimateOnScroll className="col-md-5 text-center mb-4 mb-md-0 fade-up">
-                        <img src="assets/Pro.webp" alt="Composer's Photo" loading="lazy" decoding="async" />
+                        <img src="assets/Pro.avif" alt="Composer's Photo" loading="lazy" decoding="async" />
                     </AnimateOnScroll>
                     <AnimateOnScroll className="col-md-7 fade-up" style={{transitionDelay: '200ms'}}>
                         <h3>Panuwat Sarapat "Sax"</h3>

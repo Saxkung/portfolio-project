@@ -1,14 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback, Suspense, lazy } from 'react';
 import './App.css';
 import WaveSurfer from 'wavesurfer.js'
+import Hls from 'hls.js';
 
 import { portfolioDataCategorized } from './data/portfolioData';
 
 import Header from './components/Header';
 import HeroSection from './components/HeroSection';
-//import PortfolioSection from './components/PortfolioSection';
-//import AboutSection from './components/AboutSection';
-//import ContactSection from './components/ContactSection';
 import BottomPlayer from './components/BottomPlayer';
 
 
@@ -32,11 +30,11 @@ function App() {
         volumeBeforeMute: 1,
     });
     
-    const wavesurferRef = useRef(null); // Ref สำหรับเก็บ instance ของ WaveSurfer
-    const waveformContainerRef = useRef(null); // Ref สำหรับ div ที่จะให้ WaveSurfer วาดคลื่นเสียง
-    
+    const wavesurferRef = useRef(null);
+    const waveformContainerRef = useRef(null);
+    const audioRef = useRef(null);
+    const hlsRef = useRef(null);
 
-    
     const handlePlayPause = useCallback(() => {
         if (wavesurferRef.current) {
             wavesurferRef.current.playPause();
@@ -81,8 +79,17 @@ function App() {
     const handleClosePlayer = useCallback(() => {
         if (wavesurferRef.current) {
             wavesurferRef.current.stop();
+            wavesurferRef.current.empty();
+            // ไม่มี cancelAjax
         }
-        // ล้างค่า Playlist ที่กำลังเล่นอยู่
+        if (hlsRef.current) {
+            hlsRef.current.destroy();
+            hlsRef.current = null;
+        }
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.src = '';
+        }
         setPlayerState(prev => ({
             ...prev,
             isPlaying: false,
@@ -121,13 +128,14 @@ function App() {
     }, []);
 
     useEffect(() => {
-        if (!waveformContainerRef.current) return;
+        if (!waveformContainerRef.current || !audioRef.current) return;
 
-        
-        // สร้าง instance ของ WaveSurfer
+        const audio = audioRef.current;
+
         const ws = WaveSurfer.create({
             container: waveformContainerRef.current,
-
+            backend: 'MediaElement',
+            media: audio,
             waveColor: '#4d4d4d',
             progressColor: '#c6b185',
             height: 40,
@@ -143,45 +151,145 @@ function App() {
 
         wavesurferRef.current = ws;
 
-        const onReady = () => {
-            setPlayerState(prev => ({ ...prev, duration: ws.getDuration() }));
-            ws.play();
-        };
-        const onPlay = () => setPlayerState(prev => ({ ...prev, isPlaying: true }));
-        const onPause = () => setPlayerState(prev => ({ ...prev, isPlaying: false }));
-        const onTimeUpdate = (currentTime) => setPlayerState(prev => ({ ...prev, currentTime }));
-        const onFinish = () => handleNext();
-        const onInteraction = (newTime) => ws.setTime(newTime);
+        ws.on('ready', () => {
+            const duration = ws.getDuration();
+            setPlayerState(prev => ({ ...prev, duration }));
+        });
 
-        ws.on('ready', onReady);
-        ws.on('play', onPlay);
-        ws.on('pause', onPause);
-        ws.on('timeupdate', onTimeUpdate);
-        ws.on('finish', onFinish);
-        ws.on('interaction', onInteraction);
+        ws.on('play', () => setPlayerState(prev => ({ ...prev, isPlaying: true })));
+        ws.on('pause', () => setPlayerState(prev => ({ ...prev, isPlaying: false })));
+        ws.on('timeupdate', (currentTime) => setPlayerState(prev => ({ ...prev, currentTime })));
+        ws.on('finish', handleNext);
+        ws.on('interaction', () => {
+            const duration = ws.getDuration();
+            if (duration) ws.seekTo(ws.getCurrentTime() / duration);
+        });
 
-        // Cleanup function
+        ws.on('error', (err) => {
+            if (err.name !== 'AbortError') {
+                console.error('WaveSurfer error:', err);
+            }
+        });
+
         return () => {
-            ws.destroy();
-        }
+            if (ws) {
+                ws.destroy();
+            }
+            if (hlsRef.current) {
+                hlsRef.current.destroy();
+                hlsRef.current = null;
+            }
+        };
     }, [handleNext]);
 
+    
     useEffect(() => {
-        if (wavesurferRef.current && playerState.currentTrack) {
-            wavesurferRef.current.load(playerState.currentTrack.src);
+        if (!wavesurferRef.current || !playerState.currentTrack || !audioRef.current) return;
+
+        const track = playerState.currentTrack;
+        const trackUrl = track.src;
+        const isHLS = trackUrl.endsWith('.m3u8');
+        const jsonUrl = trackUrl.replace(/\.(mp3|m3u8)(?=\?|$)/i, '.json');
+
+        // Cleanup
+        if (hlsRef.current) {
+            hlsRef.current.destroy();
+            hlsRef.current = null;
         }
+        if (wavesurferRef.current) {
+            wavesurferRef.current.empty();
+            wavesurferRef.current.stop();
+        }
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.src = '';
+        }
+
+        const loadTrack = async () => {
+            let peaks = null;
+            let duration = null;
+
+            //โหลด peaks.json
+            try {
+                const res = await fetch(jsonUrl);
+                if (res.ok) {
+                    const data = await res.json();
+                    peaks = data.data;
+                    duration = data.duration;
+                    console.log('Peaks โหลดสำเร็จ:', { duration, length: peaks?.length });
+                }
+            } catch (err) {
+                console.warn('โหลด peaks ไม่ได้:', err);
+            }
+
+            const audio = audioRef.current;
+
+            //ตั้งค่า HLS (เสียงเล่นผ่าน audio)
+            if (isHLS) {
+                if (Hls.isSupported()) {
+                    const hls = new Hls();
+                    hlsRef.current = hls;
+                    hls.loadSource(trackUrl);
+                    hls.attachMedia(audio);
+
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        console.log('HLS โหลดสำเร็จ');
+                        audio.play().catch(e => console.warn('Auto-play ถูกบล็อก:', e));
+                    });
+
+                    hls.on(Hls.Events.ERROR, (e, data) => console.error('HLS Error:', data));
+                } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
+                    audio.src = trackUrl;
+                    audio.addEventListener('loadedmetadata', () => {
+                        console.log('Safari HLS loaded');
+                        audio.play().catch(e => console.warn('Auto-play ถูกบล็อก:', e));
+                    }, { once: true });
+                }
+            } else {
+                audio.src = trackUrl;
+                audio.load();
+                audio.play().catch(e => console.warn('Auto-play ถูกบล็อก:', e));
+            }
+
+            //วาด waveform จาก peaks เท่านั้น (ไม่ decode audio!)
+            if (peaks && duration && wavesurferRef.current) {
+                try {
+                    wavesurferRef.current.loadPeaks(peaks);
+                    wavesurferRef.current.setDuration(duration); // ตั้ง duration
+                    console.log('Waveform วาดจาก peaks สำเร็จ');
+                } catch (e) {
+                    console.error('loadPeaks error:', e);
+                }
+            }
+        };
+
+        loadTrack();
+
+        return () => {
+            if (hlsRef.current) {
+                hlsRef.current.destroy();
+                hlsRef.current = null;
+            }
+            if (wavesurferRef.current) {
+                wavesurferRef.current.empty();
+                wavesurferRef.current.stop();
+            }
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.src = '';
+            }
+        };
     }, [playerState.currentTrack]);
     
     useEffect(() => {
-        if(wavesurferRef.current) {
+        if (wavesurferRef.current) {
             wavesurferRef.current.setVolume(playerState.volume);
         }
     }, [playerState.volume]);
 
-
     return (
-        <React.Fragment>       
-            <div className={`app-content visible`}>
+        <React.Fragment>
+            <div className="app-content visible">
                 <Header />
                 <main>
                     <HeroSection />
@@ -197,6 +305,10 @@ function App() {
                 <Suspense fallback={null}> 
                     <ContactSection />
                 </Suspense>
+
+                {/* เพิ่ม <audio> ซ่อนไว้ */}
+                <audio ref={audioRef} style={{ display: 'none' }} />
+
                 <BottomPlayer 
                     playerState={playerState}
                     onPlayPause={handlePlayPause}
@@ -205,7 +317,7 @@ function App() {
                     onVolumeChange={handleVolumeChange}
                     onToggleMute={toggleMute}
                     waveformContainerRef={waveformContainerRef}
-                    onClosePlayer={handleClosePlayer} // 8. ส่ง ref ไปให้ BottomPlayer
+                    onClosePlayer={handleClosePlayer}
                 />
             </div>
         </React.Fragment>

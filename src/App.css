@@ -590,6 +590,16 @@ footer {
     
 }
 
+.waveform-wrapper {
+    flex: 1;   
+    margin: 0 8px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #2a2a2a;  
+    position: relative;  
+    height: 40px;
+}
+
 @media (max-width: 768px) {
     .bottom-player {
         height: auto;
@@ -673,11 +683,15 @@ footer {
     background: none;
     border: none;
     color: var(--text-muted-color);
+    font-size: 1.2rem;
+    padding: 0 8px;
+    cursor: pointer;
     transition: all 0.2s;
 }
 .player-buttons button:hover {
     color: var(--text-color);
 }
+
 .player-buttons .play-pause-btn {
     background-color: var(--text-color);
     color: var(--primary-color);
@@ -702,7 +716,8 @@ footer {
     display: flex;
     align-items: center;
     gap: 8px;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
 }
 .player-progress-container .time {
     font-family: inter, sans-serif;
@@ -759,6 +774,8 @@ footer {
  .player-volume-bar:hover::-webkit-slider-thumb {
      background: var(--accent-color);
 }
+
+
 
 @media (max-width: 768px) {
     .bottom-player {
@@ -824,6 +841,12 @@ footer {
         margin-top: 8px;
         flex-grow: 1;
     }
+    
+    .waveform-wrapper {
+        height: 36px; 
+        margin: 0 4px;
+    }
+    
 }
 
 

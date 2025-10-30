@@ -20,7 +20,6 @@ export default function BottomPlayer({ playerState, onPlayPause, onNext, onPrev,
 
     return (
         <div className={`bottom-player ${activePlaylist ? 'show' : ''}`}>
-            {/* close button top-right */}
             <button
                 className="btn-close-player"
                 aria-label="Close Player"
@@ -46,7 +45,15 @@ export default function BottomPlayer({ playerState, onPlayPause, onNext, onPrev,
                 <div className="player-progress-container">
                     <span className="time">{formatTime(currentTime)}</span>
                     
-                    <div ref={waveformContainerRef} style={{ width: '100%' }}></div>
+                    <div
+                        ref={waveformContainerRef}
+                        className="waveform-wrapper"
+                        style={{
+                            width: '100%',
+                            height: '40px',
+                            position: 'relative'
+                        }}
+                    />
                     
                     <span className="time">{formatTime(duration)}</span>
                 </div>
