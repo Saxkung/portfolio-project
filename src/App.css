@@ -590,16 +590,6 @@ footer {
     
 }
 
-.waveform-wrapper {
-    flex: 1;   
-    margin: 0 8px;
-    overflow: hidden;
-    border-radius: 4px;
-    background: #2a2a2a;  
-    position: relative;  
-    height: 40px;
-}
-
 @media (max-width: 768px) {
     .bottom-player {
         height: auto;
@@ -840,13 +830,7 @@ footer {
         order: 3;
         margin-top: 8px;
         flex-grow: 1;
-    }
-    
-    .waveform-wrapper {
-        height: 36px; 
-        margin: 0 4px;
-    }
-    
+    }    
 }
 
 

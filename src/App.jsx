@@ -252,13 +252,13 @@ function App() {
             }
 
             //วาด waveform จาก peaks เท่านั้น (ไม่ decode audio!)
-            if (peaks && duration && wavesurferRef.current) {
+           if (peaks && duration && wavesurferRef.current) {
                 try {
-                    wavesurferRef.current.loadPeaks(peaks);
-                    wavesurferRef.current.setDuration(duration); // ตั้ง duration
+                    // v7 ใช้ load() พร้อม peaks และ duration
+                    wavesurferRef.current.load(audio.src, peaks, duration);
                     console.log('Waveform วาดจาก peaks สำเร็จ');
                 } catch (e) {
-                    console.error('loadPeaks error:', e);
+                    console.error('load peaks error:', e);
                 }
             }
         };
@@ -325,4 +325,3 @@ function App() {
 }
 
 export default App;
-
