@@ -213,29 +213,14 @@ main {
     padding: 60px 0;
 }
 
-.draggable-container {
-    position: relative;
-    overflow: hidden;
-    touch-action: pan-y pinch-zoom;
-    -webkit-user-select: none;
-    user-select: none;
+.swiper {
+    margin: -20px 0;
 }
-
-.draggable-row {
-    display: flex;
-    margin: 0 -12px;
-    padding: 20px 12px;
-    scroll-snap-type: x proximity;
-    scroll-padding: 0 12px;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: none;
-    overscroll-behavior-x: contain;
-    isolation: isolate;
+.swiper-slide {
+    flex-shrink: 0;  /* ป้องกัน shrink */
 }
-
 .card-wrapper {
     flex-shrink: 0;
-    width: calc(100% / 3.5); /* ปรับให้เห็น 3.5 cards ต่อแถว */
     padding: 12px; /* เพิ่ม padding รอบ card */
     scroll-snap-align: start;
     contain: layout;
@@ -251,7 +236,6 @@ main {
 
 @media (max-width: 1200px) {
     .card-wrapper { 
-        width: calc(100% / 3.2); /* แสดง 3.2 cards ต่อแถวใน screen ขนาดกลาง */
         padding: 10px;
     }
     .draggable-row {
@@ -262,14 +246,12 @@ main {
 
 @media (max-width: 992px) {
     .card-wrapper { 
-        width: calc(100% / 2.2); /* แสดง 2.2 cards ต่อแถวใน tablet */
         padding: 10px;
     }
 }
 
 @media (max-width: 768px) {
     .card-wrapper { 
-        width: calc(100% / 1.2); /* แสดง 1.2 cards ต่อแถวใน mobile */
         padding: 8px; 
     }
     .draggable-row {

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, Suspense, lazy } from 
 import './App.css';
 import WaveSurfer from 'wavesurfer.js'
 import Hls from 'hls.js';
+import 'swiper/css';
 
 import { portfolioDataCategorized } from './data/portfolioData';
 
@@ -147,6 +148,7 @@ function App() {
             dragToSeek: true,
             responsive: true,
             hideScrollbar: true,
+            
         });
 
         wavesurferRef.current = ws;
@@ -251,10 +253,8 @@ function App() {
                 audio.play().catch(e => console.warn('Auto-play ถูกบล็อก:', e));
             }
 
-            //วาด waveform จาก peaks เท่านั้น (ไม่ decode audio!)
            if (peaks && duration && wavesurferRef.current) {
                 try {
-                    // v7 ใช้ load() พร้อม peaks และ duration
                     wavesurferRef.current.load(audio.src, peaks, duration);
                     console.log('Waveform วาดจาก peaks สำเร็จ');
                 } catch (e) {
@@ -276,7 +276,7 @@ function App() {
             }
             if (audioRef.current) {
                 audioRef.current.pause();
-                audioRef.current.src = '';
+                //audioRef.current.src = '';
             }
         };
     }, [playerState.currentTrack]);
