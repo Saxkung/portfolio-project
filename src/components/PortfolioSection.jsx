@@ -22,29 +22,29 @@ export default function PortfolioSection({ playerState, onTrackSelect, portfolio
                         </AnimateOnScroll>
                         <AnimateOnScroll className="stagger-in">
                             <Swiper
-                                modules={[FreeMode, Mousewheel]}  // เพิ่ม modules ที่ต้องการ
-                                spaceBetween={8}  // ช่องว่างระหว่างการ์ด (เหมือน gap: 8px ใน DraggableRow)
+                                modules={[FreeMode, Mousewheel]}
+                                spaceBetween={0.2}  // ช่องว่างระหว่างการ์ด
                                 
-                                freeMode={{  // ทำให้เลื่อนอิสระ เหมือน DraggableRow
+                                freeMode={{
                                     enabled: true,
-                                    momentum: true,  // เพิ่ม momentum สำหรับการเลื่อนแบบ inertia
+                                    momentum: true,
                                     momentumRatio: 1,
-                                    momentumBounce: true,  // overscroll bounce effect
-                                    momentumBounceRatio: 0.35,  // ปรับ bounce ให้คล้าย overscroll ใน DraggableRow
-                                    sticky: true,  // เลื่อนแบบติดหนึบ
+                                    momentumBounce: true,
+                                    momentumBounceRatio: 0.35,
+                                    sticky: true,
                                 }}
-                                    mousewheel={{  // รองรับ mouse wheel สำหรับเลื่อนด้วย trackpad/mouse
+                                    mousewheel={{
                                     enabled: true,
-                                    forceToAxis: true,  // เลื่อนเฉพาะแนวนอน
+                                    forceToAxis: true, 
                                 }}
-                                grabCursor={true}  // เปลี่ยน cursor เป็น grab เมื่อ hover
-                                touchRatio={1.2}  // ปรับความไว touch (คล้าย factor ใน DraggableRow)
-                                breakpoints={{  // Responsive: ปรับจำนวนการ์ดตามขนาดหน้าจอ
-                                    0: { slidesPerView: 1.5 },  // มือถือ: แสดง ~1-2 การ์ด
-                                    768: { slidesPerView: 3 },   // Tablet: 3 การ์ด
-                                    1200: { slidesPerView: 4 },  // Desktop: 4 การ์ด
+                                grabCursor={true}
+                                touchRatio={1.2}
+                                breakpoints={{
+                                    0: { slidesPerView: 1.3 },  // มือถือ: แสดง 1.3 การ์ด
+                                    768: { slidesPerView: 3.3 },   // Tablet: 3.3 การ์ด
+                                    1200: { slidesPerView: 4.3 },  // Desktop: 4.3 การ์ด
                                 }}
-                                onSlideChange={() => console.log('slide changed')}  // Optional: event handler ถ้าต้องการ track
+                                onSlideChange={() => console.log('slide changed')}
                             >
                                 {categoryData.items.map(item => (
                                     <SwiperSlide key={item.id}>
