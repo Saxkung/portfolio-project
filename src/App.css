@@ -665,18 +665,25 @@ footer {
 }
 
 .player-buttons .play-pause-btn {
-    background-color: var(--text-color);
-    color: var(--primary-color);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    background: none;
+    border: none;
+    
+    color: var(--text-color); 
+    
+    font-size: 2rem;
+    line-height: 1;
+    
     display: flex;
     align-items: center;
     justify-content: center;
+    
+    padding: 0;
+    transition: all 0.2s ease;
 }
 .player-buttons .play-pause-btn:hover {
     transform: scale(1.05);
-    background-color: var(--accent-color);
+    
+    color: var(--accent-color); 
 }
 
 .player-buttons .play-pause-btn i.fa-play {
@@ -813,6 +820,77 @@ footer {
         margin-top: 8px;
         flex-grow: 1;
     }    
+}
+
+
+@keyframes bounce-bar {
+  0%   { transform: scaleY(0.3); }
+  30%  { transform: scaleY(1.0); }
+  60%  { transform: scaleY(0.5); }
+  100% { transform: scaleY(0.3); }
+}
+
+.playing-icon-container {
+  width: 16px;
+  height: 16px; 
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.playing-bar {
+  width: 4px;
+  height: 100%;
+  background-color: var(--accent-color);
+  
+  animation-name: bounce-bar;
+  animation-duration: 1.4s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  transform-origin: bottom;
+}
+
+/* 4. ทำให้มันขยับไม่พร้อมกัน */
+.playing-bar.bar-1 {
+  animation-delay: -0.2s;
+}
+.playing-bar.bar-2 {
+  animation-delay: -0.4s;
+}
+.playing-bar.bar-3 {
+  animation-delay: -0.6s;
+}
+.playlist-item.active .playing-bar {
+  background-color: var(--primary-color);
+}
+
+/* --- ไอคอน Pause แบบกำลังพัก (สามแท่ง) --- */
+.paused-icon-container {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end; /* จัดชิดล่าง */
+}
+
+.paused-bar {
+  width: 4px;
+  background-color: var(--accent-color);
+  transform-origin: bottom;
+}
+
+.paused-bar.bar-1 {
+  height: 25%;
+}
+.paused-bar.bar-2 {
+  height: 25%;
+}
+.paused-bar.bar-3 {
+  height: 25%;
+}
+
+.playlist-item.active .paused-bar {
+  background-color: var(--primary-color);
 }
 
 

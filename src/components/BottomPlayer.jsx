@@ -38,7 +38,7 @@ export default function BottomPlayer({ playerState, onPlayPause, onNext, onPrev,
                 <div className="player-buttons">
                     <button onClick={onPrev} aria-label="Previous Track"><i className="fas fa-backward-step"></i></button>
                     <button onClick={onPlayPause} className="play-pause-btn" aria-label="Play/Pause">
-                        {isPlaying ? <i className="fas fa-pause"></i> : <i className="fas fa-play"></i>}
+                        {isPlaying ? <i className="fas fa-circle-pause"></i> : <i className="fas fa-circle-play"></i>}
                     </button>
                     <button onClick={onNext} aria-label="Next Track"><i className="fas fa-forward-step"></i></button>
                 </div>

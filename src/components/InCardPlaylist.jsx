@@ -14,8 +14,20 @@ export default function InCardPlaylist({ item, playerState, onTrackSelect }) {
                         onClick={() => onTrackSelect(item, index)}
                     >
                         <span className="track-name">{track.title}</span>
-                        {isThisPlaylistActive && currentTrack?.src === track.src && isPlaying && <i className="fas fa-volume-high"></i>}
-                        {isThisPlaylistActive && currentTrack?.src === track.src && !isPlaying && <i className="fas fa-pause play-indicator"></i>}
+                        {isThisPlaylistActive && currentTrack?.src === track.src && isPlaying && (
+                            <div className="playing-icon-container">
+                                <span className="playing-bar bar-1"></span>
+                                <span className="playing-bar bar-2"></span>
+                                <span className="playing-bar bar-3"></span>
+                            </div>
+                        )}
+                        {isThisPlaylistActive && currentTrack?.src === track.src && !isPlaying && (
+                            <div className="paused-icon-container">
+                                <span className="paused-bar bar-1"></span>
+                                <span className="paused-bar bar-2"></span>
+                                <span className="paused-bar bar-3"></span>
+                            </div>
+                        )}
                     </li>
                 ))}
             </ul>

@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useCallback, Suspense, lazy } from 
 import './App.css';
 import WaveSurfer from 'wavesurfer.js'
 import Hls from 'hls.js';
-import 'swiper/css';
 
 import { portfolioDataCategorized } from './data/portfolioData';
 
@@ -15,6 +14,8 @@ const PortfolioSection = lazy(() => import('./components/PortfolioSection'));
 const AboutSection = lazy(() => import('./components/AboutSection'));
 const ContactSection = lazy(() => import('./components/ContactSection'));
 
+// --- 1. สร้าง Cache ไว้ข้างนอก ---
+const peaksCache = new Map();
  
 function App() {
 
@@ -81,7 +82,6 @@ function App() {
         if (wavesurferRef.current) {
             wavesurferRef.current.stop();
             wavesurferRef.current.empty();
-            // ไม่มี cancelAjax
         }
         if (hlsRef.current) {
             hlsRef.current.destroy();
@@ -211,18 +211,33 @@ function App() {
             let peaks = null;
             let duration = null;
 
-            //โหลด peaks.json
-            try {
-                const res = await fetch(jsonUrl);
-                if (res.ok) {
-                    const data = await res.json();
-                    peaks = data.data;
-                    duration = data.duration;
-                    console.log('Peaks โหลดสำเร็จ:', { duration, length: peaks?.length });
+            // --- 2. โค้ด Cache ที่แก้ไขแล้ว ---
+            if (peaksCache.has(jsonUrl)) {
+                // 2a. ถ้ามีใน Cache: ดึงจาก Cache เลย
+                const cachedData = peaksCache.get(jsonUrl);
+                peaks = cachedData.data;
+                duration = cachedData.duration;
+                console.log('Peaks โหลดจาก Cache สำเร็จ:', { duration, length: peaks?.length });
+            
+            } else {
+                // 2b. ถ้าไม่มีใน Cache: โหลดใหม่
+                try {
+                    const res = await fetch(jsonUrl);
+                    if (res.ok) {
+                        const data = await res.json();
+                        peaks = data.data;
+                        duration = data.duration;
+                        
+                        // --- 3. เก็บลง Cache! ---
+                        peaksCache.set(jsonUrl, data); 
+                        
+                        console.log('Peaks โหลดใหม่ (และเก็บลง Cache) สำเร็จ:', { duration, length: peaks?.length });
+                    }
+                } catch (err) {
+                    console.warn('โหลด peaks ไม่ได้:', err);
                 }
-            } catch (err) {
-                console.warn('โหลด peaks ไม่ได้:', err);
             }
+            // --- จบส่วนที่แก้ไข ---
 
             const audio = audioRef.current;
 
@@ -324,4 +339,5 @@ function App() {
     );
 }
 
+// --- 4. เพิ่มส่วนที่ขาดหายไป ---
 export default App;
